@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Integral EGMA Ecuador</title>
+    <title>Sistema Integral EGMA Ecuador - Versión Detallada</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @media print {
             .no-print { display: none !important; }
@@ -13,494 +14,618 @@
             body { background-color: white; }
             .shadow-md, .shadow-lg { box-shadow: none !important; }
         }
-        .tab-active { border-bottom: 4px solid #2563eb; color: #1e40af; font-weight: bold; }
-        .radio-label { cursor: pointer; transition: all 0.2s; }
-        .radio-input:checked + .radio-content { background-color: #ebf8ff; border-color: #4299e1; border-width: 2px; }
+        
+        /* Estilos para las tarjetas de selección */
+        .radio-input:checked + .radio-content {
+            background-color: #eff6ff; /* blue-50 */
+            border-color: #2563eb; /* blue-600 */
+            border-width: 2px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1), 0 2px 4px -1px rgba(37, 99, 235, 0.06);
+        }
+        /* Indicador visual de selección */
+        .radio-input:checked + .radio-content .check-indicator {
+            display: block;
+        }
+
+        .radio-content {
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s;
+            height: 100%; /* Altura completa para uniformidad */
+            cursor: pointer;
+        }
+        
+        .tab-btn.active {
+            border-bottom: 4px solid #2563eb;
+            color: #1e40af;
+            font-weight: bold;
+        }
+        .tab-btn {
+            color: #6b7280;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800">
 
-    <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+    <!-- BARRA SUPERIOR -->
     <nav class="bg-white shadow-md sticky top-0 z-50 no-print">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-2">
-                    <span class="text-2xl">📊</span>
-                    <span class="font-bold text-xl text-gray-800">EGMA Manager</span>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fa-solid fa-calculator text-blue-600 text-2xl mr-3"></i>
+                    <span class="font-bold text-xl text-gray-800 tracking-tight">EGMA Manager <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded ml-2">Detallado</span></span>
                 </div>
-                <div class="flex space-x-4">
-                    <button onclick="switchTab('evaluador')" id="btn-evaluador" class="tab-active py-4 px-4 hover:bg-gray-50 focus:outline-none">
-                        📝 Modo Evaluador
+                <div class="flex space-x-4 md:space-x-8">
+                    <button onclick="switchTab('evaluador')" id="btn-evaluador" class="tab-btn active flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium hover:text-blue-600">
+                        <i class="fa-solid fa-user-pen mr-2"></i> Evaluador
                     </button>
-                    <button onclick="switchTab('analista')" id="btn-analista" class="text-gray-500 py-4 px-4 hover:bg-gray-50 focus:outline-none">
-                        📈 Modo Analista (Reporte Curso)
+                    <button onclick="switchTab('analista')" id="btn-analista" class="tab-btn flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium hover:text-blue-600">
+                        <i class="fa-solid fa-chart-pie mr-2"></i> Analista
                     </button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- PESTAÑA 1: MODO EVALUADOR (FORMULARIO) -->
-    <div id="tab-evaluador" class="max-w-4xl mx-auto my-8 p-4">
+    <!-- PESTAÑA 1: EVALUADOR -->
+    <div id="view-evaluador" class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         
-        <div class="bg-blue-700 text-white p-6 rounded-t-xl shadow-lg">
-            <h1 class="text-2xl font-bold text-center uppercase">Ficha de Evaluación Individual</h1>
-            <p class="text-center opacity-90">Protocolo EGMA - Subnivel Medio</p>
-        </div>
+        <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+            <!-- Encabezado Formulario -->
+            <div class="bg-blue-700 p-6 rounded-t-lg text-white shadow-md">
+                <div class="flex items-center justify-center mb-2">
+                    <i class="fa-solid fa-clipboard-list text-3xl mr-3"></i>
+                    <h2 class="text-2xl font-bold uppercase text-center">Ficha de Evaluación Individual</h2>
+                </div>
+                <p class="text-center opacity-90 text-sm">Protocolo EGMA - Subnivel Medio (5to a 7mo EGB)</p>
+            </div>
 
-        <form id="evalForm" class="bg-white p-6 shadow-lg rounded-b-xl space-y-8">
-            
-            <!-- Datos del Estudiante -->
-            <section class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h2 class="text-lg font-semibold mb-4 text-blue-800 border-b pb-2">Datos Informativos</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Nombre del Estudiante</label>
-                        <input type="text" id="studentName" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-blue-500" placeholder="Apellido, Nombre">
+            <form id="evalForm" class="p-6">
+                <!-- Datos Estudiante -->
+                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-8 shadow-sm">
+                    <h3 class="text-blue-800 font-bold border-b border-gray-300 pb-2 mb-4 text-lg">
+                        <i class="fa-solid fa-id-card mr-2"></i>Datos Informativos
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Estudiante</label>
+                            <input type="text" id="studentName" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2" placeholder="Apellido, Nombre">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Grado</label>
+                            <select id="studentGrade" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2">
+                                <option>5to EGB</option>
+                                <option>6to EGB</option>
+                                <option>7mo EGB</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                            <input type="date" id="evalDate" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2">
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Grado / Paralelo</label>
-                        <input type="text" id="studentGrade" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-blue-500">
+                </div>
+
+                <!-- Contenedor de Preguntas Dinámicas -->
+                <div id="questions-container" class="space-y-8">
+                    <!-- Se llena con JS -->
+                </div>
+
+                <hr class="my-8 border-gray-200">
+
+                <!-- Sección de Errores -->
+                <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-8 shadow-sm">
+                    <h3 class="text-xl font-bold text-red-800 mb-2 flex items-center">
+                        <i class="fa-solid fa-triangle-exclamation mr-2"></i>Detección de Errores Conceptuales
+                    </h3>
+                    <p class="text-red-600 text-sm mb-6 bg-red-100 p-2 rounded inline-block">
+                        <i class="fa-solid fa-circle-info mr-1"></i>
+                        Marque SÍ únicamente si el error es evidente y repetitivo durante la prueba.
+                    </p>
+                    <div id="errors-container" class="space-y-3">
+                        <!-- Se llena con JS -->
                     </div>
                 </div>
-            </section>
 
-            <!-- GENERADOR DE PREGUNTAS (Script genera esto dinámicamente para ahorrar espacio) -->
-            <div id="questionsContainer"></div>
-
-            <!-- Sección Errores -->
-            <section class="bg-red-50 p-6 rounded-lg border border-red-200">
-                <h2 class="text-xl font-bold text-red-800 mb-4">Detección de Errores Conceptuales</h2>
-                <div id="errorsContainer" class="space-y-4"></div>
-            </section>
-
-            <!-- Botones de Acción -->
-            <div class="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-4 mt-8 pt-6 border-t">
-                <button type="button" onclick="saveEvaluation()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg flex items-center justify-center space-x-2 transition transform hover:-translate-y-1">
-                    <span>💾 Guardar Archivo del Estudiante</span>
-                </button>
-                <button type="reset" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-8 rounded-lg shadow transition">
-                    Limpiar Formulario
-                </button>
-            </div>
-            <p class="text-center text-xs text-gray-500 mt-2">
-                * Al hacer clic en Guardar, se descargará un archivo .json. Guárdelo en la carpeta del curso.
-            </p>
-
-        </form>
-    </div>
-
-    <!-- PESTAÑA 2: MODO ANALISTA (DASHBOARD) -->
-    <div id="tab-analista" class="hidden max-w-6xl mx-auto my-8 p-4">
-        
-        <div class="bg-white p-8 rounded-xl shadow-lg text-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-800 mb-4">Consolidado de Resultados del Curso</h2>
-            <p class="text-gray-600 mb-6">Seleccione todos los archivos (.json) generados por los evaluadores para procesar las estadísticas automáticamente.</p>
-            
-            <div class="flex justify-center">
-                <label class="w-full md:w-1/2 flex flex-col items-center px-4 py-6 bg-white text-blue rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue-50 transition border-blue-500 text-blue-500">
-                    <svg class="w-8 h-8" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                        <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
-                    </svg>
-                    <span class="mt-2 text-base leading-normal">Seleccionar Archivos de Evaluación</span>
-                    <input type='file' id="fileInput" multiple accept=".json" class="hidden" onchange="processFiles()" />
-                </label>
-            </div>
-            <p id="fileCount" class="mt-4 font-bold text-green-600"></p>
-        </div>
-
-        <!-- Resultados -->
-        <div id="dashboardResults" class="hidden space-y-8">
-            
-            <!-- Resumen General -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-xl shadow border-l-4 border-blue-500">
-                    <h3 class="text-gray-500 text-sm font-bold uppercase">Total Estudiantes</h3>
-                    <p class="text-4xl font-bold text-gray-800" id="totalStudents">0</p>
+                <!-- Botones Acción -->
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 pt-6 border-t bg-gray-50 sticky bottom-0 p-4 -mx-6 -mb-6 border-gray-200 z-20">
+                    <button type="button" onclick="saveData()" class="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg flex items-center justify-center transition transform hover:-translate-y-1 text-lg border border-green-700">
+                        <i class="fa-solid fa-floppy-disk mr-2"></i> Guardar y Descargar Archivo
+                    </button>
+                    <button type="button" onclick="resetForm()" class="w-full md:w-auto bg-white hover:bg-gray-100 text-gray-800 font-bold py-3 px-8 rounded-lg shadow border border-gray-300 transition text-lg">
+                        <i class="fa-solid fa-eraser mr-2"></i> Limpiar Formulario
+                    </button>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow border-l-4 border-green-500">
-                    <h3 class="text-gray-500 text-sm font-bold uppercase">Promedio Global (Nivel)</h3>
-                    <p class="text-4xl font-bold text-gray-800" id="globalAverage">0.0</p>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow border-l-4 border-red-500">
-                    <h3 class="text-gray-500 text-sm font-bold uppercase">Estudiantes en Riesgo (Nivel 1)</h3>
-                    <p class="text-4xl font-bold text-gray-800" id="riskStudents">0</p>
-                </div>
-            </div>
-
-            <!-- Gráficos de Preguntas -->
-            <div class="bg-white p-6 rounded-xl shadow">
-                <h3 class="text-xl font-bold text-gray-800 mb-6 border-b pb-2">Desempeño por Pregunta</h3>
-                <div class="h-80">
-                    <canvas id="questionsChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Tabla de Errores -->
-            <div class="bg-white p-6 rounded-xl shadow">
-                <h3 class="text-xl font-bold text-gray-800 mb-6 border-b pb-2">Prevalencia de Errores Conceptuales</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm text-left text-gray-500">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3">Error Conceptual</th>
-                                <th class="px-6 py-3">Casos Detectados</th>
-                                <th class="px-6 py-3 text-center">% del Curso</th>
-                                <th class="px-6 py-3">Barra de Frecuencia</th>
-                            </tr>
-                        </thead>
-                        <tbody id="errorsTableBody">
-                            <!-- Filas generadas por JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Tabla Detallada -->
-            <div class="bg-white p-6 rounded-xl shadow overflow-hidden">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">Detalle de Estudiantes</h3>
-                <div class="overflow-x-auto max-h-96">
-                    <table class="min-w-full text-sm text-left">
-                        <thead class="bg-gray-100 sticky top-0">
-                            <tr>
-                                <th class="p-3">Nombre</th>
-                                <th class="p-3 text-center">P1.1</th>
-                                <th class="p-3 text-center">P1.2</th>
-                                <th class="p-3 text-center">P1.3</th>
-                                <th class="p-3 text-center">P2.1</th>
-                                <th class="p-3 text-center">P2.2</th>
-                                <th class="p-3 text-center">P3.1</th>
-                                <th class="p-3 text-center">P3.2</th>
-                                <th class="p-3 text-center">P4.1</th>
-                                <th class="p-3 text-center">P4.2</th>
-                            </tr>
-                        </thead>
-                        <tbody id="detailsTableBody" class="divide-y divide-gray-200"></tbody>
-                    </table>
-                </div>
-            </div>
-
+            </form>
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- PESTAÑA 2: ANALISTA -->
+    <div id="view-analista" class="hidden max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        
+        <!-- Área de Carga -->
+        <div class="bg-white p-10 rounded-xl shadow-lg text-center mb-8 border-2 border-dashed border-gray-300 hover:border-blue-500 transition-colors cursor-pointer group" id="drop-zone" onclick="document.getElementById('fileInput').click()">
+            <div class="mb-4">
+                <span class="inline-block p-4 rounded-full bg-blue-50 group-hover:bg-blue-100 transition">
+                    <i class="fa-solid fa-folder-open text-5xl text-blue-500"></i>
+                </span>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mt-2">Cargar Evaluaciones del Curso</h2>
+            <p class="text-gray-500 mb-6 max-w-md mx-auto">Haga clic aquí para seleccionar todos los archivos <code>.json</code> descargados por los evaluadores y generar el reporte consolidado.</p>
+            
+            <input type="file" id="fileInput" multiple accept=".json" class="hidden" onchange="processFiles(this.files)">
+            <button class="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 shadow-lg transition pointer-events-none">
+                <i class="fa-solid fa-upload mr-2"></i> Seleccionar Archivos
+            </button>
+            <p id="upload-status" class="mt-4 text-sm font-bold text-green-600 hidden animate-pulse"></p>
+        </div>
+
+        <!-- Dashboard de Resultados -->
+        <div id="dashboard" class="hidden space-y-8">
+            
+            <!-- KPIs -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-500">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500 text-xs font-bold uppercase tracking-wider">Total Evaluados</p>
+                            <p class="text-4xl font-bold text-gray-800 mt-2" id="kpi-total">0</p>
+                        </div>
+                        <i class="fa-solid fa-users text-blue-200 text-3xl"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow border-l-4 border-indigo-500">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500 text-xs font-bold uppercase tracking-wider">Promedio Nivel</p>
+                            <p class="text-4xl font-bold text-gray-800 mt-2" id="kpi-avg">0.0</p>
+                        </div>
+                        <i class="fa-solid fa-chart-line text-indigo-200 text-3xl"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-500">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500 text-xs font-bold uppercase tracking-wider">Éxito (N3/N4)</p>
+                            <p class="text-4xl font-bold text-gray-800 mt-2" id="kpi-success">0%</p>
+                        </div>
+                        <i class="fa-solid fa-check-circle text-green-200 text-3xl"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow border-l-4 border-red-500">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500 text-xs font-bold uppercase tracking-wider">En Riesgo (N1)</p>
+                            <p class="text-4xl font-bold text-red-600 mt-2" id="kpi-risk">0</p>
+                        </div>
+                        <i class="fa-solid fa-triangle-exclamation text-red-200 text-3xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico Principal -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Promedio de Nivel por Pregunta</h3>
+                <div class="h-80 w-full">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Tabla de Errores -->
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 text-red-700 border-b pb-2">
+                        <i class="fa-solid fa-bug mr-2"></i>Prevalencia de Errores
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-red-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left font-semibold text-red-800">Error Conceptual</th>
+                                    <th class="px-4 py-2 text-center font-semibold text-red-800">Cant.</th>
+                                    <th class="px-4 py-2 text-center font-semibold text-red-800">%</th>
+                                </tr>
+                            </thead>
+                            <tbody id="errors-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Lista de Estudiantes -->
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">
+                        <i class="fa-solid fa-list-ol mr-2"></i>Resultados Individuales
+                    </h3>
+                    <div class="overflow-y-auto h-80 border rounded">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-gray-100 sticky top-0">
+                                <tr>
+                                    <th class="px-4 py-3 text-left font-semibold text-gray-700">Estudiante</th>
+                                    <th class="px-4 py-3 text-center font-semibold text-gray-700">Promedio</th>
+                                    <th class="px-4 py-3 text-center font-semibold text-gray-700">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="students-table-body" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- DATOS Y LÓGICA -->
     <script>
-        // --- DATOS DEL FORMULARIO ---
-        const questionsData = [
-            { id: "q1_1", title: "1.1 Concepto Histórico", desc: "Invención de símbolos / Registro" },
-            { id: "q1_2", title: "1.2 Lectura de Números", desc: "405.012.030" },
-            { id: "q1_3", title: "1.3 Valor Posicional", desc: "Descomposición aditiva" },
-            { id: "q2_1", title: "2.1 Sucesión Creciente", desc: "Patrón complejo (+50)" },
-            { id: "q2_2", title: "2.2 Sucesión Decreciente", desc: "Patrón inverso (-8)" },
-            { id: "q3_1", title: "3.1 Fluidez Multiplicativa", desc: "Cronometrada (60s)" },
-            { id: "q3_2", title: "3.2 Heurística/Trucos", desc: "Tabla del 9 / x1000" },
-            { id: "q4_1", title: "4.1 Resolución Problemas", desc: "Fábrica de Chocolate" },
-            { id: "q4_2", title: "4.2 Vocabulario", desc: "Términos de la multiplicación" }
+        // --- 1. DEFINICIÓN EXACTA DE LA RÚBRICA ---
+        const rubricData = [
+            {
+                id: "1.1",
+                title: "1.1 Concepto Histórico (Origen)",
+                levels: [
+                    { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No da respuesta lógica o no entiende la necesidad de registro." },
+                    { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Sugiere conteo simple pero sin método de registro físico." },
+                    { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Propone marcas, piedras o símbolos (correspondencia 1 a 1)." },
+                    { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Explica la lógica del sistema: necesidad de agrupar o inventar símbolos." }
+                ]
+            },
+            {
+                id: "1.2",
+                title: "1.2 Lectura de Números (405.012.030)",
+                levels: [
+                    { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Lee dígitos por separado (ej. 'cuatro, cero, cinco...')." },
+                    { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Lee con dificultad, pausa en puntos de mil o ignora ceros intermedios." },
+                    { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Lee fluidamente respetando periodos de millón y mil." },
+                    { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Lectura automática, segura y correcta al primer intento." }
+                ]
+            },
+            {
+                id: "1.3",
+                title: "1.3 Valor Posicional y Descomposición",
+                levels: [
+                    { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No logra descomponer ni identificar valor posicional." },
+                    { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Identifica valor (ej. 80 millones) pero falla la descomposición aditiva." },
+                    { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Identifica valor y realiza la descomposición aditiva correctamente." },
+                    { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Explica la lógica posicional y el rol del cero con fluidez." }
+                ]
+            },
+            {
+                id: "2.1",
+                title: "2.1 Sucesiones Crecientes (Patrón complejo)",
+                levels: [
+                    { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No identifica patrón o adivina números (solo maneja +1)." },
+                    { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Identifica patrón (+50) pero comete errores de cálculo al sumar." },
+                    { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Completa la sucesión correctamente (1.350)." },
+                    { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Crea sucesiones complejas o explica la regla general verbalmente." }
+                ]
+            },
+            {
+                id: "2.2",
+                title: "2.2 Sucesiones Decrecientes (Inversa)",
+                levels: [
+                    { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No logra la cuenta regresiva o resta incorrectamente." },
+                    { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Identifica que baja, pero erra en la resta (error de cálculo)." },
+                    { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Completa correctamente (48) identificando patrón -8." },
+                    { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Reconoce patrones inversos (relaciona con tabla del 8)." }
+                ]
+            },
+            {
+                id: "3.1",
+                title: "3.1 Cálculo Mental (Fluidez)",
+                levels: [
+                    { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Necesita conteo físico (dedos). Tasa error > 50%." },
+                    { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Correcto pero lento (>5 seg/ítem). No automatizado." },
+                    { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Recuperación automática (<3 seg/ítem) y correcta." },
+                    { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Fluidez total. Aplica en contextos de estimación." }
+                ]
+            },
+            {
+                id: "3.2",
+                title: "3.2 Estrategias y Trucos (x9, x1000)",
+                levels: [
+                    { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No conoce trucos, intenta sumar repetidamente." },
+                    { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Aplica truco mecánicamente pero se confunde al explicar." },
+                    { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Usa trucos eficientemente (ej. agregar ceros)." },
+                    { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Generaliza el truco a otros casos nuevos." }
+                ]
+            },
+            {
+                id: "4.1",
+                title: "4.1 Resolución de Problemas",
+                levels: [
+                    { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Error de modelado: No sabe qué operación usar." },
+                    { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Identifica operación correcta pero falla en el algoritmo." },
+                    { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Plantea y resuelve el problema correctamente." },
+                    { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Propone múltiples estrategias o verifica sentido de respuesta." }
+                ]
+            },
+            {
+                id: "4.2",
+                title: "4.2 Vocabulario Matemático",
+                levels: [
+                    { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Desconoce términos ('cosa de arriba', 'respuesta')." },
+                    { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Confunde multiplicando con multiplicador. No sabe 'Producto'." },
+                    { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Identifica correctamente los 3 términos técnicos." },
+                    { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Usa vocabulario técnico con naturalidad durante toda la prueba." }
+                ]
+            }
         ];
 
-        const errorsData = [
-            { id: "err_1", title: "Sintaxis (Concatenación)", desc: "Escribe 3000500 por 3.500" },
-            { id: "err_2", title: "Magnitud", desc: "Falla comparación longitudes iguales" },
-            { id: "err_3", title: "Fluidez (Conteo)", desc: "Suma repetida en vez de multiplicar" },
-            { id: "err_4", title: "Resta Invertida", desc: "Resta menor al mayor siempre" },
-            { id: "err_5", title: "Modelado (Palabra Clave)", desc: "Opera sin contexto" },
-            { id: "err_6", title: "Vocabulario Confuso", desc: "Confunde términos" }
+        const errorList = [
+            { id: "err_sintaxis", text: "Sintaxis: Escribe '3000500' en vez de 3.500.000 (Concatenación)" },
+            { id: "err_magnitud", text: "Magnitud: Falla al comparar números de igual longitud (405 vs 450)" },
+            { id: "err_conteo", text: "Fluidez: Usa suma repetida en vez de multiplicar (7x6 = 7+7...)" },
+            { id: "err_resta", text: "Resta: Resta invertida (siempre resta el número menor del mayor)" },
+            { id: "err_modelo", text: "Modelado: Opera basándose solo en palabras clave sin contexto" },
+            { id: "err_vocab", text: "Vocabulario: Confunde 'Producto' con 'Suma' o 'Diferencia'" }
         ];
 
-        // --- INICIALIZACIÓN ---
+        // --- 2. INICIALIZACIÓN ---
         document.addEventListener('DOMContentLoaded', () => {
-            renderQuestions();
-            renderErrors();
+            document.getElementById('evalDate').valueAsDate = new Date();
+            renderForm();
         });
 
-        function renderQuestions() {
-            const container = document.getElementById('questionsContainer');
-            questionsData.forEach(q => {
-                const html = `
-                <div class="mb-6 p-4 border rounded-lg hover:shadow-sm transition bg-white">
-                    <h3 class="font-bold text-lg mb-1">${q.title}</h3>
-                    <p class="text-sm text-gray-500 mb-3">${q.desc}</p>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-2 mb-3">
-                        ${[1,2,3,4].map(level => `
-                        <label class="radio-label block relative">
-                            <input type="radio" name="${q.id}" value="${level}" class="radio-input sr-only">
-                            <div class="radio-content p-3 border rounded-md text-sm h-full hover:bg-gray-50 flex flex-col justify-center items-center text-center">
-                                <span class="font-bold block ${getColorText(level)}">Nivel ${level}</span>
-                            </div>
-                        </label>`).join('')}
-                    </div>
-                    <input type="text" name="${q.id}_obs" class="w-full p-2 border rounded text-xs bg-gray-50" placeholder="Observación para ${q.title}">
-                </div>`;
-                container.innerHTML += html;
-            });
-        }
-
-        function renderErrors() {
-            const container = document.getElementById('errorsContainer');
-            errorsData.forEach(e => {
-                const html = `
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center border-b border-red-100 pb-2 last:border-0">
-                    <div class="md:col-span-8">
-                        <span class="font-bold text-gray-800">${e.title}</span>
-                        <p class="text-xs text-gray-600">${e.desc}</p>
-                    </div>
-                    <div class="md:col-span-4 flex space-x-4">
-                        <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="radio" name="${e.id}" value="si" class="w-5 h-5 text-red-600"> <span>Sí</span>
-                        </label>
-                        <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="radio" name="${e.id}" value="no" class="w-5 h-5 text-green-600" checked> <span>No</span>
-                        </label>
-                    </div>
-                </div>`;
-                container.innerHTML += html;
-            });
-        }
-
-        function getColorText(level) {
-            return ['text-red-600', 'text-orange-500', 'text-green-600', 'text-blue-600'][level-1];
-        }
-
-        // --- LÓGICA DE PESTAÑAS ---
         function switchTab(tab) {
-            document.getElementById('tab-evaluador').classList.toggle('hidden', tab !== 'evaluador');
-            document.getElementById('tab-analista').classList.toggle('hidden', tab !== 'analista');
-            
-            // Actualizar estilos botones
-            const btnEval = document.getElementById('btn-evaluador');
-            const btnAnal = document.getElementById('btn-analista');
-            
-            if(tab === 'evaluador') {
-                btnEval.className = 'tab-active py-4 px-4 hover:bg-gray-50 focus:outline-none';
-                btnAnal.className = 'text-gray-500 py-4 px-4 hover:bg-gray-50 focus:outline-none';
-            } else {
-                btnEval.className = 'text-gray-500 py-4 px-4 hover:bg-gray-50 focus:outline-none';
-                btnAnal.className = 'tab-active py-4 px-4 hover:bg-gray-50 focus:outline-none';
+            document.getElementById('view-evaluador').classList.toggle('hidden', tab !== 'evaluador');
+            document.getElementById('view-analista').classList.toggle('hidden', tab !== 'analista');
+            document.getElementById('btn-evaluador').classList.toggle('active', tab === 'evaluador');
+            document.getElementById('btn-analista').classList.toggle('active', tab === 'analista');
+        }
+
+        // --- 3. RENDERIZADO DEL FORMULARIO (EVALUADOR) ---
+        function renderForm() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = rubricData.map(q => `
+                <div class="bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div class="bg-blue-50 px-4 py-3 border-b flex justify-between items-center">
+                        <h3 class="font-bold text-gray-800 text-lg">${q.title}</h3>
+                        <span class="text-xs font-mono text-gray-500 bg-white border px-2 py-1 rounded">ID: ${q.id}</span>
+                    </div>
+                    <div class="p-4">
+                        <!-- GRID RESPONSIVO PARA MOSTRAR TODO EL DETALLE -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            ${q.levels.map(lvl => `
+                                <label class="block relative h-full group cursor-pointer">
+                                    <input type="radio" name="q_${q.id}" value="${lvl.val}" class="radio-input sr-only">
+                                    <div class="radio-content p-4 rounded-lg bg-white h-full flex flex-col hover:bg-blue-50">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="font-bold text-sm ${lvl.color} uppercase tracking-wider">${lvl.label}</span>
+                                            <div class="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center bg-white group-hover:border-blue-400">
+                                                <div class="w-3 h-3 rounded-full bg-blue-600 hidden check-indicator"></div>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm text-gray-600 flex-grow leading-relaxed">
+                                            ${lvl.text}
+                                        </p>
+                                    </div>
+                                </label>
+                            `).join('')}
+                        </div>
+                        <div class="mt-4">
+                            <input type="text" name="obs_${q.id}" class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 border bg-gray-50" placeholder="Observaciones específicas para ${q.title}...">
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            const errContainer = document.getElementById('errors-container');
+            errContainer.innerHTML = errorList.map(err => `
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b last:border-0 py-4 border-red-100 hover:bg-red-50 transition px-2 rounded">
+                    <span class="text-gray-800 font-medium text-sm w-full sm:w-3/4 pr-4 mb-2 sm:mb-0 flex items-center">
+                         <i class="fa-solid fa-circle-exclamation text-red-300 mr-2 text-xs"></i>
+                         ${err.text}
+                    </span>
+                    <div class="flex space-x-6">
+                        <label class="inline-flex items-center cursor-pointer group">
+                            <input type="radio" name="${err.id}" value="si" class="text-red-600 focus:ring-red-500 h-5 w-5 border-gray-300">
+                            <span class="ml-2 text-base font-bold text-gray-700 group-hover:text-red-700">Sí</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer group">
+                            <input type="radio" name="${err.id}" value="no" class="text-green-600 focus:ring-green-500 h-5 w-5 border-gray-300" checked>
+                            <span class="ml-2 text-base font-bold text-gray-700 group-hover:text-green-700">No</span>
+                        </label>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function resetForm() {
+            if(confirm('¿Seguro que deseas borrar todo el formulario?')) {
+                document.getElementById('evalForm').reset();
+                document.getElementById('evalDate').valueAsDate = new Date();
+                window.scrollTo(0,0);
             }
         }
 
-        // --- LÓGICA DE GUARDADO (JSON) ---
-        function saveEvaluation() {
-            const form = document.getElementById('evalForm');
-            const studentName = document.getElementById('studentName').value;
-            
-            if (!studentName) { alert("Por favor ingrese el nombre del estudiante"); return; }
+        // --- 4. GUARDAR DATOS (JSON) ---
+        function saveData() {
+            const student = document.getElementById('studentName').value;
+            if (!student) { alert("Por favor ingrese el nombre del estudiante"); return; }
 
             const data = {
-                student: studentName,
-                grade: document.getElementById('studentGrade').value,
-                timestamp: new Date().toISOString(),
-                answers: {},
+                meta: {
+                    student: student,
+                    grade: document.getElementById('studentGrade').value,
+                    date: document.getElementById('evalDate').value,
+                },
+                scores: {},
+                observations: {},
                 errors: {}
             };
 
-            // Recolectar respuestas niveles
-            questionsData.forEach(q => {
-                const selected = form.querySelector(`input[name="${q.id}"]:checked`);
-                data.answers[q.id] = selected ? parseInt(selected.value) : 0;
+            // Recopilar respuestas
+            rubricData.forEach(q => {
+                const checked = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                data.scores[q.id] = checked ? parseInt(checked.value) : 0;
+                
+                const obs = document.querySelector(`input[name="obs_${q.id}"]`).value;
+                if(obs) data.observations[q.id] = obs;
             });
 
-            // Recolectar errores
-            errorsData.forEach(e => {
-                const selected = form.querySelector(`input[name="${e.id}"]:checked`);
-                data.errors[e.id] = selected ? selected.value : 'no';
+            // Recopilar errores
+            errorList.forEach(err => {
+                const checked = document.querySelector(`input[name="${err.id}"]:checked`);
+                data.errors[err.id] = checked ? checked.value : 'no';
             });
 
-            // Descargar Archivo
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            const fileName = `EGMA_${studentName.replace(/ /g,"_")}.json`;
-            downloadAnchorNode.setAttribute("download", fileName);
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
+            // Crear Blob y Descargar
+            const jsonStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `EGMA_${student.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
-        // --- LÓGICA DE ANÁLISIS ---
+        // --- 5. MODO ANALISTA (CARGA Y PROCESAMIENTO) ---
         let chartInstance = null;
 
-        async function processFiles() {
-            const fileInput = document.getElementById('fileInput');
-            const files = fileInput.files;
-            
+        async function processFiles(files) {
             if (files.length === 0) return;
-
-            document.getElementById('fileCount').innerText = `Procesando ${files.length} archivos...`;
             
-            const evaluations = [];
-            
-            // Leer archivos asíncronamente
-            const readFile = (file) => {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = event => resolve(JSON.parse(event.target.result));
-                    reader.onerror = error => reject(error);
-                    reader.readAsText(file);
-                });
-            };
+            const results = [];
+            const status = document.getElementById('upload-status');
+            status.classList.remove('hidden');
+            status.textContent = `Procesando ${files.length} archivos...`;
 
-            try {
-                for (let file of files) {
-                    const data = await readFile(file);
-                    evaluations.push(data);
+            for (let file of files) {
+                try {
+                    const text = await file.text();
+                    results.push(JSON.parse(text));
+                } catch (e) {
+                    console.error("Error leyendo archivo", file.name, e);
                 }
-                generateReport(evaluations);
-                document.getElementById('fileCount').innerText = `¡Éxito! Datos cargados de ${files.length} estudiantes.`;
-                document.getElementById('dashboardResults').classList.remove('hidden');
-            } catch (err) {
-                alert("Error leyendo archivos. Asegúrese de que sean los JSON generados por el evaluador.");
-                console.error(err);
             }
+
+            calculateAndRender(results);
+            status.textContent = `¡Análisis Completado! ${results.length} evaluaciones cargadas.`;
+            document.getElementById('dashboard').classList.remove('hidden');
         }
 
-        function generateReport(data) {
-            // 1. Totales
-            const total = data.length;
-            document.getElementById('totalStudents').innerText = total;
+        function calculateAndRender(data) {
+            const totalStudents = data.length;
+            let sumGlobal = 0;
+            let countScores = 0;
+            let studentsInRisk = 0; // Nivel 1 en >= 3 preguntas
+            let acquiredCount = 0; // Promedio >= 3
 
-            // 2. Promedio y Riesgo
-            let sumLevels = 0;
-            let countLevels = 0;
-            let studentsInRisk = 0; // Tienen Nivel 1 en más del 50% de preguntas
+            // Contadores por pregunta
+            const questionAvgs = {};
+            rubricData.forEach(q => questionAvgs[q.id] = { sum: 0, count: 0 });
 
-            data.forEach(student => {
-                let sLevels = 0;
+            // Contadores Errores
+            const errorCounts = {};
+            errorList.forEach(e => errorCounts[e.id] = 0);
+
+            // Detalle Estudiantes
+            const studentDetails = [];
+
+            data.forEach(d => {
+                let sSum = 0;
                 let sCount = 0;
-                let nivel1Count = 0;
-                
-                Object.values(student.answers).forEach(val => {
-                    if(val > 0) {
-                        sLevels += val;
+                let n1Count = 0;
+
+                // Scores
+                Object.entries(d.scores).forEach(([qid, val]) => {
+                    if (val > 0) {
+                        sSum += val;
                         sCount++;
-                        if(val === 1) nivel1Count++;
+                        if (val === 1) n1Count++;
+                        if (questionAvgs[qid]) {
+                            questionAvgs[qid].sum += val;
+                            questionAvgs[qid].count++;
+                        }
                     }
                 });
 
-                if(sCount > 0) {
-                    sumLevels += (sLevels/sCount);
-                    countLevels++;
-                }
-                if(nivel1Count >= 4) studentsInRisk++; // Criterio ejemplo
-            });
-
-            const avg = countLevels > 0 ? (sumLevels / countLevels).toFixed(2) : 0;
-            document.getElementById('globalAverage').innerText = avg;
-            document.getElementById('riskStudents').innerText = studentsInRisk;
-            
-            // Colores semáforo
-            const riskEl = document.getElementById('riskStudents');
-            riskEl.className = `text-4xl font-bold ${studentsInRisk > 0 ? 'text-red-600' : 'text-green-600'}`;
-
-            // 3. Gráfico de Barras (Niveles por Pregunta)
-            renderChart(data);
-
-            // 4. Tabla de Errores
-            renderErrorsTable(data);
-
-            // 5. Tabla de Detalles
-            renderDetailsTable(data);
-        }
-
-        function renderChart(data) {
-            const ctx = document.getElementById('questionsChart').getContext('2d');
-            
-            // Preparar datasets
-            const labels = questionsData.map(q => q.id); // ids cortos para eje X
-            
-            // Calcular promedios por pregunta
-            const averages = questionsData.map(q => {
-                let sum = 0;
-                let count = 0;
-                data.forEach(s => {
-                    if(s.answers[q.id]) { sum += s.answers[q.id]; count++; }
+                // Errores
+                Object.entries(d.errors).forEach(([eid, val]) => {
+                    if (val === 'si' && errorCounts[eid] !== undefined) errorCounts[eid]++;
                 });
-                return count > 0 ? (sum / count).toFixed(2) : 0;
+
+                const sAvg = sCount > 0 ? (sSum / sCount) : 0;
+                sumGlobal += sAvg;
+                
+                if (sAvg >= 3) acquiredCount++;
+                const isRisk = n1Count >= 3;
+                if (isRisk) studentsInRisk++;
+
+                studentDetails.push({
+                    name: d.meta.student,
+                    avg: sAvg.toFixed(2),
+                    status: isRisk ? 'Riesgo' : (sAvg >= 3 ? 'Adquirido' : 'En Proceso')
+                });
             });
 
-            if(chartInstance) chartInstance.destroy();
+            // --- Render KPIs ---
+            document.getElementById('kpi-total').textContent = totalStudents;
+            document.getElementById('kpi-avg').textContent = totalStudents > 0 ? (sumGlobal / totalStudents).toFixed(2) : "0.0";
+            document.getElementById('kpi-success').textContent = totalStudents > 0 ? Math.round((acquiredCount / totalStudents) * 100) + "%" : "0%";
+            document.getElementById('kpi-risk').textContent = studentsInRisk;
 
+            // --- Render Chart ---
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            const values = rubricData.map(q => {
+                const qData = questionAvgs[q.id];
+                return qData.count > 0 ? (qData.sum / qData.count).toFixed(2) : 0;
+            });
+
+            if (chartInstance) chartInstance.destroy();
             chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: labels,
+                    labels: rubricData.map(q => q.title.length > 25 ? q.title.substring(0, 25) + "..." : q.title),
                     datasets: [{
-                        label: 'Nivel Promedio (1-4)',
-                        data: averages,
-                        backgroundColor: averages.map(v => v < 2 ? '#ef4444' : (v < 3 ? '#f97316' : '#22c55e')),
-                        borderWidth: 1
+                        label: 'Promedio de Nivel (1-4)',
+                        data: values,
+                        backgroundColor: values.map(v => v < 2 ? '#ef4444' : v < 3 ? '#f59e0b' : '#10b981'),
+                        borderRadius: 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true, max: 4, title: {display: true, text: 'Nivel de Logro'} }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                title: (items) => {
-                                    const qId = items[0].label;
-                                    const qObj = questionsData.find(q => q.id === qId);
-                                    return qObj ? qObj.title : qId;
-                                }
-                            }
-                        }
-                    }
+                    scales: { y: { min: 0, max: 4 } }
                 }
             });
-        }
 
-        function renderErrorsTable(data) {
-            const tbody = document.getElementById('errorsTableBody');
-            tbody.innerHTML = '';
-            
-            errorsData.forEach(err => {
-                let count = 0;
-                data.forEach(s => {
-                    if (s.errors[err.id] === 'si') count++;
-                });
-                
-                const percentage = ((count / data.length) * 100).toFixed(1);
-                const barColor = percentage > 30 ? 'bg-red-500' : 'bg-blue-500';
+            // --- Render Tabla Errores ---
+            const tbodyErr = document.getElementById('errors-table-body');
+            tbodyErr.innerHTML = errorList
+                .map(err => {
+                    const count = errorCounts[err.id];
+                    const pct = totalStudents > 0 ? ((count / totalStudents) * 100).toFixed(1) : "0.0";
+                    return { ...err, count, pct };
+                })
+                .sort((a, b) => b.count - a.count) 
+                .map(err => `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-4 py-3 font-medium text-gray-700">${err.text}</td>
+                        <td class="px-4 py-3 text-center text-gray-900">${err.count}</td>
+                        <td class="px-4 py-3 text-center text-red-600 font-bold">${err.pct}%</td>
+                    </tr>
+                `).join('');
 
-                const row = `
-                <tr class="bg-white border-b hover:bg-gray-50">
-                    <td class="px-6 py-4 font-medium text-gray-900">${err.title}</td>
-                    <td class="px-6 py-4">${count} / ${data.length}</td>
-                    <td class="px-6 py-4 text-center font-bold">${percentage}%</td>
-                    <td class="px-6 py-4 w-1/3">
-                        <div class="w-full bg-gray-200 rounded-full h-2.5">
-                            <div class="${barColor} h-2.5 rounded-full" style="width: ${percentage}%"></div>
-                        </div>
+            // --- Render Tabla Estudiantes ---
+            const tbodyStu = document.getElementById('students-table-body');
+            tbodyStu.innerHTML = studentDetails.map(s => `
+                <tr class="hover:bg-gray-50 border-b">
+                    <td class="px-4 py-3 font-medium text-gray-900">${s.name}</td>
+                    <td class="px-4 py-3 text-center font-bold text-gray-700">${s.avg}</td>
+                    <td class="px-4 py-3 text-center">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold text-white ${s.status === 'Riesgo' ? 'bg-red-500' : s.status === 'Adquirido' ? 'bg-green-500' : 'bg-yellow-500'}">
+                            ${s.status}
+                        </span>
                     </td>
-                </tr>`;
-                tbody.innerHTML += row;
-            });
-        }
-
-        function renderDetailsTable(data) {
-            const tbody = document.getElementById('detailsTableBody');
-            tbody.innerHTML = '';
-
-            data.forEach(s => {
-                let cells = `<td class="p-3 font-medium text-gray-900 sticky left-0 bg-white border-r">${s.student}</td>`;
-                
-                questionsData.forEach(q => {
-                    const val = s.answers[q.id] || 0;
-                    let color = 'text-gray-300';
-                    if(val === 1) color = 'bg-red-100 text-red-800';
-                    if(val === 2) color = 'bg-orange-100 text-orange-800';
-                    if(val === 3) color = 'bg-green-100 text-green-800';
-                    if(val === 4) color = 'bg-blue-100 text-blue-800';
-                    
-                    cells += `<td class="p-3 text-center border"><span class="px-2 py-1 rounded text-xs font-bold ${color}">${val}</span></td>`;
-                });
-                
-                tbody.innerHTML += `<tr class="hover:bg-gray-50 border-b">${cells}</tr>`;
-            });
+                </tr>
+            `).join('');
         }
     </script>
 </body>
