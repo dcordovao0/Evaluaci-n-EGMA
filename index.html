@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Integral EGMA Ecuador - Versión Detallada</title>
+    <title>Sistema Integral EGMA Ecuador - Versión Final PDF</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <!-- Librería para generar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @media print {
@@ -15,24 +17,18 @@
             .shadow-md, .shadow-lg { box-shadow: none !important; }
         }
         
-        /* Estilos para las tarjetas de selección */
         .radio-input:checked + .radio-content {
-            background-color: #eff6ff; /* blue-50 */
-            border-color: #2563eb; /* blue-600 */
+            background-color: #eff6ff; 
+            border-color: #2563eb; 
             border-width: 2px;
             position: relative;
             z-index: 10;
             box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1), 0 2px 4px -1px rgba(37, 99, 235, 0.06);
         }
-        /* Indicador visual de selección */
-        .radio-input:checked + .radio-content .check-indicator {
-            display: block;
-        }
-
         .radio-content {
             border: 1px solid #e5e7eb;
             transition: all 0.2s;
-            height: 100%; /* Altura completa para uniformidad */
+            height: 100%; 
             cursor: pointer;
         }
         
@@ -55,7 +51,7 @@
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <i class="fa-solid fa-calculator text-blue-600 text-2xl mr-3"></i>
-                    <span class="font-bold text-xl text-gray-800 tracking-tight">EGMA Manager <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded ml-2">Detallado</span></span>
+                    <span class="font-bold text-xl text-gray-800 tracking-tight">EGMA Manager <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded ml-2">PDF Ready</span></span>
                 </div>
                 <div class="flex space-x-4 md:space-x-8">
                     <button onclick="switchTab('evaluador')" id="btn-evaluador" class="tab-btn active flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium hover:text-blue-600">
@@ -71,9 +67,7 @@
 
     <!-- PESTAÑA 1: EVALUADOR -->
     <div id="view-evaluador" class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-            <!-- Encabezado Formulario -->
             <div class="bg-blue-700 p-6 rounded-t-lg text-white shadow-md">
                 <div class="flex items-center justify-center mb-2">
                     <i class="fa-solid fa-clipboard-list text-3xl mr-3"></i>
@@ -146,14 +140,14 @@
     <div id="view-analista" class="hidden max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         
         <!-- Área de Carga -->
-        <div class="bg-white p-10 rounded-xl shadow-lg text-center mb-8 border-2 border-dashed border-gray-300 hover:border-blue-500 transition-colors cursor-pointer group" id="drop-zone" onclick="document.getElementById('fileInput').click()">
+        <div class="bg-white p-10 rounded-xl shadow-lg text-center mb-8 border-2 border-dashed border-gray-300 hover:border-blue-500 transition-colors cursor-pointer group no-print" id="drop-zone" onclick="document.getElementById('fileInput').click()">
             <div class="mb-4">
                 <span class="inline-block p-4 rounded-full bg-blue-50 group-hover:bg-blue-100 transition">
                     <i class="fa-solid fa-folder-open text-5xl text-blue-500"></i>
                 </span>
             </div>
             <h2 class="text-2xl font-bold text-gray-800 mt-2">Cargar Evaluaciones del Curso</h2>
-            <p class="text-gray-500 mb-6 max-w-md mx-auto">Haga clic aquí para seleccionar todos los archivos <code>.json</code> descargados por los evaluadores y generar el reporte consolidado.</p>
+            <p class="text-gray-500 mb-6 max-w-md mx-auto">Haga clic aquí para seleccionar todos los archivos <code>.json</code> descargados por los evaluadores.</p>
             
             <input type="file" id="fileInput" multiple accept=".json" class="hidden" onchange="processFiles(this.files)">
             <button class="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 shadow-lg transition pointer-events-none">
@@ -165,94 +159,89 @@
         <!-- Dashboard de Resultados -->
         <div id="dashboard" class="hidden space-y-8">
             
-            <!-- KPIs -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-500">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-gray-500 text-xs font-bold uppercase tracking-wider">Total Evaluados</p>
-                            <p class="text-4xl font-bold text-gray-800 mt-2" id="kpi-total">0</p>
-                        </div>
-                        <i class="fa-solid fa-users text-blue-200 text-3xl"></i>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow border-l-4 border-indigo-500">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-gray-500 text-xs font-bold uppercase tracking-wider">Promedio Nivel</p>
-                            <p class="text-4xl font-bold text-gray-800 mt-2" id="kpi-avg">0.0</p>
-                        </div>
-                        <i class="fa-solid fa-chart-line text-indigo-200 text-3xl"></i>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-500">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-gray-500 text-xs font-bold uppercase tracking-wider">Éxito (N3/N4)</p>
-                            <p class="text-4xl font-bold text-gray-800 mt-2" id="kpi-success">0%</p>
-                        </div>
-                        <i class="fa-solid fa-check-circle text-green-200 text-3xl"></i>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow border-l-4 border-red-500">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-gray-500 text-xs font-bold uppercase tracking-wider">En Riesgo (N1)</p>
-                            <p class="text-4xl font-bold text-red-600 mt-2" id="kpi-risk">0</p>
-                        </div>
-                        <i class="fa-solid fa-triangle-exclamation text-red-200 text-3xl"></i>
-                    </div>
-                </div>
+            <!-- Botón Descargar PDF -->
+            <div class="flex justify-end mb-4 no-print">
+                <button onclick="downloadReportPDF()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg shadow flex items-center transition">
+                    <i class="fa-solid fa-file-pdf mr-2"></i> Descargar Informe PDF
+                </button>
             </div>
 
-            <!-- Gráfico Principal -->
-            <div class="bg-white p-6 rounded-lg shadow">
-                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Promedio de Nivel por Pregunta</h3>
-                <div class="h-80 w-full">
-                    <canvas id="mainChart"></canvas>
+            <!-- Contenido del Reporte (Esto es lo que se imprime en PDF) -->
+            <div id="report-content" class="bg-white p-8 rounded-lg shadow-lg">
+                <div class="text-center mb-8 border-b pb-4">
+                    <h2 class="text-3xl font-bold text-gray-800">Informe Consolidado EGMA</h2>
+                    <p class="text-gray-500">Diagnóstico de Matemáticas - Subnivel Medio</p>
+                    <p class="text-sm text-gray-400 mt-1" id="report-date"></p>
                 </div>
-            </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Tabla de Errores -->
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4 text-red-700 border-b pb-2">
-                        <i class="fa-solid fa-bug mr-2"></i>Prevalencia de Errores
-                    </h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full text-sm">
-                            <thead class="bg-red-50">
-                                <tr>
-                                    <th class="px-4 py-2 text-left font-semibold text-red-800">Error Conceptual</th>
-                                    <th class="px-4 py-2 text-center font-semibold text-red-800">Cant.</th>
-                                    <th class="px-4 py-2 text-center font-semibold text-red-800">%</th>
-                                </tr>
-                            </thead>
-                            <tbody id="errors-table-body"></tbody>
-                        </table>
+                <!-- KPIs -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 text-center">
+                        <p class="text-blue-800 text-xs font-bold uppercase tracking-wider">Total Evaluados</p>
+                        <p class="text-4xl font-bold text-blue-900 mt-2" id="kpi-total">0</p>
+                    </div>
+                    <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200 text-center">
+                        <p class="text-indigo-800 text-xs font-bold uppercase tracking-wider">Promedio Nivel</p>
+                        <p class="text-4xl font-bold text-indigo-900 mt-2" id="kpi-avg">0.0</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200 text-center">
+                        <p class="text-green-800 text-xs font-bold uppercase tracking-wider">Éxito (N3/N4)</p>
+                        <p class="text-4xl font-bold text-green-900 mt-2" id="kpi-success">0%</p>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg border border-red-200 text-center">
+                        <p class="text-red-800 text-xs font-bold uppercase tracking-wider">En Riesgo (N1)</p>
+                        <p class="text-4xl font-bold text-red-900 mt-2" id="kpi-risk">0</p>
                     </div>
                 </div>
 
-                <!-- Lista de Estudiantes -->
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">
-                        <i class="fa-solid fa-list-ol mr-2"></i>Resultados Individuales
-                    </h3>
-                    <div class="overflow-y-auto h-80 border rounded">
-                        <table class="min-w-full text-sm">
-                            <thead class="bg-gray-100 sticky top-0">
-                                <tr>
-                                    <th class="px-4 py-3 text-left font-semibold text-gray-700">Estudiante</th>
-                                    <th class="px-4 py-3 text-center font-semibold text-gray-700">Promedio</th>
-                                    <th class="px-4 py-3 text-center font-semibold text-gray-700">Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody id="students-table-body" class="divide-y divide-gray-100"></tbody>
-                        </table>
+                <!-- Gráfico Principal -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-l-4 border-blue-500 pl-3">Promedio de Nivel por Pregunta</h3>
+                    <div class="h-80 w-full bg-white border rounded p-2">
+                        <canvas id="mainChart"></canvas>
                     </div>
                 </div>
-            </div>
 
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <!-- Tabla de Errores -->
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 border-l-4 border-red-500 pl-3">Prevalencia de Errores</h3>
+                        <div class="overflow-hidden rounded border border-gray-200">
+                            <table class="min-w-full text-sm">
+                                <thead class="bg-red-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left font-semibold text-red-800">Error Conceptual</th>
+                                        <th class="px-4 py-2 text-center font-semibold text-red-800">Cant.</th>
+                                        <th class="px-4 py-2 text-center font-semibold text-red-800">%</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="errors-table-body" class="bg-white"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Estudiantes -->
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 border-l-4 border-gray-500 pl-3">Resultados Individuales</h3>
+                        <div class="overflow-hidden rounded border border-gray-200">
+                            <table class="min-w-full text-sm">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left font-semibold text-gray-700">Estudiante</th>
+                                        <th class="px-4 py-2 text-center font-semibold text-gray-700">Prom.</th>
+                                        <th class="px-4 py-2 text-center font-semibold text-gray-700">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="students-table-body" class="divide-y divide-gray-100 bg-white"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center text-xs text-gray-400 mt-8 pt-4 border-t">
+                    Generado por EGMA Manager - Ministerio de Educación
+                </div>
+            </div>
         </div>
     </div>
 
@@ -364,6 +353,7 @@
         // --- 2. INICIALIZACIÓN ---
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('evalDate').valueAsDate = new Date();
+            document.getElementById('report-date').textContent = new Date().toLocaleDateString('es-EC', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             renderForm();
         });
 
@@ -384,7 +374,6 @@
                         <span class="text-xs font-mono text-gray-500 bg-white border px-2 py-1 rounded">ID: ${q.id}</span>
                     </div>
                     <div class="p-4">
-                        <!-- GRID RESPONSIVO PARA MOSTRAR TODO EL DETALLE -->
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             ${q.levels.map(lvl => `
                                 <label class="block relative h-full group cursor-pointer">
@@ -455,26 +444,21 @@
                 errors: {}
             };
 
-            // Recopilar respuestas
             rubricData.forEach(q => {
                 const checked = document.querySelector(`input[name="q_${q.id}"]:checked`);
                 data.scores[q.id] = checked ? parseInt(checked.value) : 0;
-                
                 const obs = document.querySelector(`input[name="obs_${q.id}"]`).value;
                 if(obs) data.observations[q.id] = obs;
             });
 
-            // Recopilar errores
             errorList.forEach(err => {
                 const checked = document.querySelector(`input[name="${err.id}"]:checked`);
                 data.errors[err.id] = checked ? checked.value : 'no';
             });
 
-            // Crear Blob y Descargar
             const jsonStr = JSON.stringify(data, null, 2);
             const blob = new Blob([jsonStr], { type: "application/json" });
             const url = URL.createObjectURL(blob);
-            
             const a = document.createElement('a');
             a.href = url;
             a.download = `EGMA_${student.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
@@ -484,7 +468,7 @@
             URL.revokeObjectURL(url);
         }
 
-        // --- 5. MODO ANALISTA (CARGA Y PROCESAMIENTO) ---
+        // --- 5. MODO ANALISTA Y PDF ---
         let chartInstance = null;
 
         async function processFiles(files) {
@@ -513,18 +497,15 @@
             const totalStudents = data.length;
             let sumGlobal = 0;
             let countScores = 0;
-            let studentsInRisk = 0; // Nivel 1 en >= 3 preguntas
-            let acquiredCount = 0; // Promedio >= 3
+            let studentsInRisk = 0; 
+            let acquiredCount = 0; 
 
-            // Contadores por pregunta
             const questionAvgs = {};
             rubricData.forEach(q => questionAvgs[q.id] = { sum: 0, count: 0 });
 
-            // Contadores Errores
             const errorCounts = {};
             errorList.forEach(e => errorCounts[e.id] = 0);
 
-            // Detalle Estudiantes
             const studentDetails = [];
 
             data.forEach(d => {
@@ -532,7 +513,6 @@
                 let sCount = 0;
                 let n1Count = 0;
 
-                // Scores
                 Object.entries(d.scores).forEach(([qid, val]) => {
                     if (val > 0) {
                         sSum += val;
@@ -545,7 +525,6 @@
                     }
                 });
 
-                // Errores
                 Object.entries(d.errors).forEach(([eid, val]) => {
                     if (val === 'si' && errorCounts[eid] !== undefined) errorCounts[eid]++;
                 });
@@ -564,13 +543,11 @@
                 });
             });
 
-            // --- Render KPIs ---
             document.getElementById('kpi-total').textContent = totalStudents;
             document.getElementById('kpi-avg').textContent = totalStudents > 0 ? (sumGlobal / totalStudents).toFixed(2) : "0.0";
             document.getElementById('kpi-success').textContent = totalStudents > 0 ? Math.round((acquiredCount / totalStudents) * 100) + "%" : "0%";
             document.getElementById('kpi-risk').textContent = studentsInRisk;
 
-            // --- Render Chart ---
             const ctx = document.getElementById('mainChart').getContext('2d');
             const values = rubricData.map(q => {
                 const qData = questionAvgs[q.id];
@@ -596,7 +573,6 @@
                 }
             });
 
-            // --- Render Tabla Errores ---
             const tbodyErr = document.getElementById('errors-table-body');
             tbodyErr.innerHTML = errorList
                 .map(err => {
@@ -613,7 +589,6 @@
                     </tr>
                 `).join('');
 
-            // --- Render Tabla Estudiantes ---
             const tbodyStu = document.getElementById('students-table-body');
             tbodyStu.innerHTML = studentDetails.map(s => `
                 <tr class="hover:bg-gray-50 border-b">
@@ -626,6 +601,21 @@
                     </td>
                 </tr>
             `).join('');
+        }
+
+        // --- FUNCIÓN PARA DESCARGAR PDF ---
+        function downloadReportPDF() {
+            const element = document.getElementById('report-content');
+            const opt = {
+                margin:       [10, 10, 10, 10], // top, left, bottom, right
+                filename:     `Informe_EGMA_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            // Generar PDF
+            html2pdf().set(opt).from(element).save();
         }
     </script>
 </body>
