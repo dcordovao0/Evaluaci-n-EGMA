@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Integral EGMA Ecuador - Versión Final PDF</title>
+    <title>Sistema Integral EGMA Ecuador - Todos los Grados</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <!-- Librería para generar PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -23,7 +22,7 @@
             border-width: 2px;
             position: relative;
             z-index: 10;
-            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1), 0 2px 4px -1px rgba(37, 99, 235, 0.06);
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1);
         }
         .radio-content {
             border: 1px solid #e5e7eb;
@@ -41,23 +40,33 @@
             color: #6b7280;
             font-weight: 500;
         }
+
+        .grade-tab.active {
+            background-color: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+        .grade-tab {
+            background-color: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800">
 
-    <!-- BARRA SUPERIOR -->
     <nav class="bg-white shadow-md sticky top-0 z-50 no-print">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <i class="fa-solid fa-calculator text-blue-600 text-2xl mr-3"></i>
-                    <span class="font-bold text-xl text-gray-800 tracking-tight">EGMA Manager <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded ml-2">PDF Ready</span></span>
+                    <span class="font-bold text-xl text-gray-800 tracking-tight">EGMA Manager <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded ml-2">Integral 1ro-7mo</span></span>
                 </div>
                 <div class="flex space-x-4 md:space-x-8">
-                    <button onclick="switchTab('evaluador')" id="btn-evaluador" class="tab-btn active flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium hover:text-blue-600">
+                    <button onclick="switchMainTab('evaluador')" id="btn-evaluador" class="tab-btn active flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium hover:text-blue-600">
                         <i class="fa-solid fa-user-pen mr-2"></i> Evaluador
                     </button>
-                    <button onclick="switchTab('analista')" id="btn-analista" class="tab-btn flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium hover:text-blue-600">
+                    <button onclick="switchMainTab('analista')" id="btn-analista" class="tab-btn flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium hover:text-blue-600">
                         <i class="fa-solid fa-chart-pie mr-2"></i> Analista
                     </button>
                 </div>
@@ -65,35 +74,35 @@
         </div>
     </nav>
 
-    <!-- PESTAÑA 1: EVALUADOR -->
     <div id="view-evaluador" class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        
+        <div class="flex flex-wrap gap-2 mb-6 no-print justify-center">
+            <button onclick="selectGrade('01')" id="tab-grade-01" class="grade-tab active px-4 py-2 rounded-lg font-medium text-sm transition shadow-sm hover:bg-blue-50 hover:text-blue-700">1ro Básica</button>
+            <button onclick="selectGrade('02')" id="tab-grade-02" class="grade-tab px-4 py-2 rounded-lg font-medium text-sm transition shadow-sm hover:bg-blue-50 hover:text-blue-700">2do Básica</button>
+            <button onclick="selectGrade('03')" id="tab-grade-03" class="grade-tab px-4 py-2 rounded-lg font-medium text-sm transition shadow-sm hover:bg-blue-50 hover:text-blue-700">3ro Básica</button>
+            <button onclick="selectGrade('04')" id="tab-grade-04" class="grade-tab px-4 py-2 rounded-lg font-medium text-sm transition shadow-sm hover:bg-blue-50 hover:text-blue-700">4to Básica</button>
+            <button onclick="selectGrade('05')" id="tab-grade-05" class="grade-tab px-4 py-2 rounded-lg font-medium text-sm transition shadow-sm hover:bg-blue-50 hover:text-blue-700">5to Básica</button>
+            <button onclick="selectGrade('06')" id="tab-grade-06" class="grade-tab px-4 py-2 rounded-lg font-medium text-sm transition shadow-sm hover:bg-blue-50 hover:text-blue-700">6to y 7mo Básica</button>
+        </div>
+
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
             <div class="bg-blue-700 p-6 rounded-t-lg text-white shadow-md">
                 <div class="flex items-center justify-center mb-2">
                     <i class="fa-solid fa-clipboard-list text-3xl mr-3"></i>
-                    <h2 class="text-2xl font-bold uppercase text-center">Ficha de Evaluación Individual</h2>
+                    <h2 class="text-2xl font-bold uppercase text-center" id="form-title">Ficha de Evaluación - 1ro de Básica</h2>
                 </div>
-                <p class="text-center opacity-90 text-sm">Protocolo EGMA - Subnivel Medio (5to a 7mo EGB)</p>
+                <p class="text-center opacity-90 text-sm">Protocolo EGMA - Versión Integral</p>
             </div>
 
             <form id="evalForm" class="p-6">
-                <!-- Datos Estudiante -->
                 <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-8 shadow-sm">
                     <h3 class="text-blue-800 font-bold border-b border-gray-300 pb-2 mb-4 text-lg">
                         <i class="fa-solid fa-id-card mr-2"></i>Datos Informativos
                     </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Estudiante</label>
-                            <input type="text" id="studentName" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2" placeholder="Apellido, Nombre">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Grado</label>
-                            <select id="studentGrade" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2">
-                                <option>5to EGB</option>
-                                <option>6to EGB</option>
-                                <option>7mo EGB</option>
-                            </select>
+                            <input type="text" id="studentName" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2" placeholder="Nombre Apellido">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
@@ -102,31 +111,26 @@
                     </div>
                 </div>
 
-                <!-- Contenedor de Preguntas Dinámicas -->
                 <div id="questions-container" class="space-y-8">
-                    <!-- Se llena con JS -->
-                </div>
+                    </div>
 
                 <hr class="my-8 border-gray-200">
 
-                <!-- Sección de Errores -->
                 <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-8 shadow-sm">
                     <h3 class="text-xl font-bold text-red-800 mb-2 flex items-center">
-                        <i class="fa-solid fa-triangle-exclamation mr-2"></i>Detección de Errores Conceptuales
+                        <i class="fa-solid fa-triangle-exclamation mr-2"></i>Detección de Errores Conceptuales Comunes
                     </h3>
                     <p class="text-red-600 text-sm mb-6 bg-red-100 p-2 rounded inline-block">
                         <i class="fa-solid fa-circle-info mr-1"></i>
-                        Marque SÍ únicamente si el error es evidente y repetitivo durante la prueba.
+                        Marque SÍ únicamente si el error es evidente durante la prueba.
                     </p>
                     <div id="errors-container" class="space-y-3">
-                        <!-- Se llena con JS -->
-                    </div>
+                        </div>
                 </div>
 
-                <!-- Botones Acción -->
                 <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 pt-6 border-t bg-gray-50 sticky bottom-0 p-4 -mx-6 -mb-6 border-gray-200 z-20">
                     <button type="button" onclick="saveData()" class="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg flex items-center justify-center transition transform hover:-translate-y-1 text-lg border border-green-700">
-                        <i class="fa-solid fa-floppy-disk mr-2"></i> Guardar y Descargar Archivo
+                        <i class="fa-solid fa-floppy-disk mr-2"></i> Guardar Json (.json)
                     </button>
                     <button type="button" onclick="resetForm()" class="w-full md:w-auto bg-white hover:bg-gray-100 text-gray-800 font-bold py-3 px-8 rounded-lg shadow border border-gray-300 transition text-lg">
                         <i class="fa-solid fa-eraser mr-2"></i> Limpiar Formulario
@@ -136,10 +140,8 @@
         </div>
     </div>
 
-    <!-- PESTAÑA 2: ANALISTA -->
     <div id="view-analista" class="hidden max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         
-        <!-- Área de Carga -->
         <div class="bg-white p-10 rounded-xl shadow-lg text-center mb-8 border-2 border-dashed border-gray-300 hover:border-blue-500 transition-colors cursor-pointer group no-print" id="drop-zone" onclick="document.getElementById('fileInput').click()">
             <div class="mb-4">
                 <span class="inline-block p-4 rounded-full bg-blue-50 group-hover:bg-blue-100 transition">
@@ -147,7 +149,7 @@
                 </span>
             </div>
             <h2 class="text-2xl font-bold text-gray-800 mt-2">Cargar Evaluaciones del Curso</h2>
-            <p class="text-gray-500 mb-6 max-w-md mx-auto">Haga clic aquí para seleccionar todos los archivos <code>.json</code> descargados por los evaluadores.</p>
+            <p class="text-gray-500 mb-6 max-w-md mx-auto">Haga clic aquí para seleccionar los archivos <code>.json</code> descargados.</p>
             
             <input type="file" id="fileInput" multiple accept=".json" class="hidden" onchange="processFiles(this.files)">
             <button class="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 shadow-lg transition pointer-events-none">
@@ -156,25 +158,21 @@
             <p id="upload-status" class="mt-4 text-sm font-bold text-green-600 hidden animate-pulse"></p>
         </div>
 
-        <!-- Dashboard de Resultados -->
         <div id="dashboard" class="hidden space-y-8">
             
-            <!-- Botón Descargar PDF -->
             <div class="flex justify-end mb-4 no-print">
                 <button onclick="downloadReportPDF()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg shadow flex items-center transition">
                     <i class="fa-solid fa-file-pdf mr-2"></i> Descargar Informe PDF
                 </button>
             </div>
 
-            <!-- Contenido del Reporte (Esto es lo que se imprime en PDF) -->
             <div id="report-content" class="bg-white p-8 rounded-lg shadow-lg">
                 <div class="text-center mb-8 border-b pb-4">
-                    <h2 class="text-3xl font-bold text-gray-800">Informe Consolidado EGMA</h2>
-                    <p class="text-gray-500">Diagnóstico de Matemáticas - Subnivel Medio</p>
+                    <h2 class="text-3xl font-bold text-gray-800">Informe Consolidado EGMA Integral</h2>
+                    <p class="text-gray-500">Resultados Analíticos de Diagnóstico</p>
                     <p class="text-sm text-gray-400 mt-1" id="report-date"></p>
                 </div>
 
-                <!-- KPIs -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                     <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 text-center">
                         <p class="text-blue-800 text-xs font-bold uppercase tracking-wider">Total Evaluados</p>
@@ -194,18 +192,16 @@
                     </div>
                 </div>
 
-                <!-- Gráfico Principal -->
                 <div class="mb-8">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-l-4 border-blue-500 pl-3">Promedio de Nivel por Pregunta</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-l-4 border-blue-500 pl-3">Promedio de Nivel por Pregunta Evaluada</h3>
                     <div class="h-80 w-full bg-white border rounded p-2">
                         <canvas id="mainChart"></canvas>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                    <!-- Tabla de Errores -->
                     <div>
-                        <h3 class="text-lg font-bold text-gray-800 mb-4 border-l-4 border-red-500 pl-3">Prevalencia de Errores</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 border-l-4 border-red-500 pl-3">Prevalencia de Errores Encontrados</h3>
                         <div class="overflow-hidden rounded border border-gray-200">
                             <table class="min-w-full text-sm">
                                 <thead class="bg-red-50">
@@ -220,7 +216,6 @@
                         </div>
                     </div>
 
-                    <!-- Lista de Estudiantes -->
                     <div>
                         <h3 class="text-lg font-bold text-gray-800 mb-4 border-l-4 border-gray-500 pl-3">Resultados Individuales</h3>
                         <div class="overflow-hidden rounded border border-gray-200">
@@ -228,6 +223,7 @@
                                 <thead class="bg-gray-100">
                                     <tr>
                                         <th class="px-4 py-2 text-left font-semibold text-gray-700">Estudiante</th>
+                                        <th class="px-4 py-2 text-center font-semibold text-gray-700">Grado</th>
                                         <th class="px-4 py-2 text-center font-semibold text-gray-700">Prom.</th>
                                         <th class="px-4 py-2 text-center font-semibold text-gray-700">Estado</th>
                                     </tr>
@@ -237,137 +233,361 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="text-center text-xs text-gray-400 mt-8 pt-4 border-t">
-                    Generado por EGMA Manager - USFQ School Fab Lab
-                </div>
             </div>
         </div>
     </div>
 
-    <!-- DATOS Y LÓGICA -->
     <script>
-        // --- 1. DEFINICIÓN EXACTA DE LA RÚBRICA ---
-        const rubricData = [
-            {
-                id: "1.1",
-                title: "1.1 Concepto Histórico (Origen)",
-                levels: [
-                    { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No da respuesta lógica o no entiende la necesidad de registro." },
-                    { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Sugiere conteo simple pero sin método de registro físico." },
-                    { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Propone marcas, piedras o símbolos (correspondencia 1 a 1)." },
-                    { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Explica la lógica del sistema: necesidad de agrupar o inventar símbolos." }
+        // --- BASE DE DATOS DE TODOS LOS GRADOS ---
+        const gradesDB = {
+            "01": {
+                title: "Primero de Básica (Preparatoria)",
+                questions: [
+                    {
+                        id: "1.1", title: "1.1 Lectura Visual (1 al 10)",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No reconoce ningún número o los confunde totalmente." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Reconoce 1 o 2 números con ayuda." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Reconoce la mayoría de los números con ligera pausa." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Reconoce y nombra todos los números inmediatamente." }
+                        ]
+                    },
+                    {
+                        id: "2.1", title: "2.1 Correspondencia Uno a Uno",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No logra contar o dice números al azar." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Cuenta repitiendo o saltando elementos (sin cardinalidad)." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Cuenta 1 a 1 correctamente determinando el total." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Conteo rápido, preciso y comprende que el último es el total." }
+                        ]
+                    },
+                    {
+                        id: "3.1", title: "3.1 Discriminación Visual de Figuras",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No reconoce ni el círculo ni el triángulo." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Señala las figuras con duda o comete errores." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Reconoce y señala el círculo y triángulo correctamente." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Nombra y reconoce las figuras de forma inmediata." }
+                        ]
+                    }
+                ],
+                errors: [
+                    { id: "e1_corr", text: "Falta de correspondencia uno a uno al contar." },
+                    { id: "e1_num", text: "Desconocimiento o inversión visual de números básicos (1 al 10)." },
+                    { id: "e1_fig", text: "Confusión entre figuras geométricas básicas." }
                 ]
             },
-            {
-                id: "1.2",
-                title: "1.2 Lectura de Números (405.012.030)",
-                levels: [
-                    { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Lee dígitos por separado (ej. 'cuatro, cero, cinco...')." },
-                    { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Lee con dificultad, pausa en puntos de mil o ignora ceros intermedios." },
-                    { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Lee fluidamente respetando periodos de millón y mil." },
-                    { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Lectura automática, segura y correcta al primer intento." }
+            "02": {
+                title: "Segundo de Básica",
+                questions: [
+                    {
+                        id: "1.1", title: "1.1 Conteo Secuencial",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No sabe seguir la secuencia." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Sigue un número pero titubea o se equivoca en la decena." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Completa la secuencia numérica de forma correcta." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Completa la secuencia de forma automática y fluida." }
+                        ]
+                    },
+                    {
+                        id: "2.1", title: "2.1 Geometría y Colores",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Falla en identificar la forma y el color." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Identifica el color pero no la forma geométrica, o viceversa." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Identifica correctamente el triángulo y su color." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Respuesta inmediata, discrimina atributos múltiples sin dudar." }
+                        ]
+                    },
+                    {
+                        id: "3.1", title: "3.1 Fluidez Operativa (45s)",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Uso permanente de dedos y múltiples errores de cálculo." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Usa dedos pero acierta, o cálculo mental muy lento (>5s)." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Cálculo mental correcto en la mayoría de los ítems." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Fluidez total mental y rápida evocación." }
+                        ]
+                    }
+                ],
+                errors: [
+                    { id: "e2_dedos", text: "Dependencia permanente del conteo con dedos." },
+                    { id: "e2_forma", text: "Dificultad para cruzar información (forma geométrica + color)." },
+                    { id: "e2_secuencia", text: "Bloqueo en el cambio de familia numérica (ej. del 49 al 50)." }
                 ]
             },
-            {
-                id: "1.3",
-                title: "1.3 Valor Posicional y Descomposición",
-                levels: [
-                    { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No logra descomponer ni identificar valor posicional." },
-                    { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Identifica valor (ej. 80 millones) pero falla la descomposición aditiva." },
-                    { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Identifica valor y realiza la descomposición aditiva correctamente." },
-                    { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Explica la lógica posicional y el rol del cero con fluidez." }
+            "03": {
+                title: "Tercero de Básica",
+                questions: [
+                    {
+                        id: "1.1", title: "1.1 Comparación de Cantidades",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No logra leer los números de tres cifras." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Lee los números pero no logra determinar cuál es mayor." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Lee y compara correctamente (354 es mayor)." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Explica la comparación basándose en el valor posicional." }
+                        ]
+                    },
+                    {
+                        id: "2.1", title: "2.1 Reconocimiento 3D",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No logra asociar las figuras 3D con los objetos reales." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Identifica correctamente una sola relación (dado o lata)." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Identifica ambas relaciones analógicas correctamente." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Además de relacionar, utiliza sus nombres técnicos (cubo, cilindro)." }
+                        ]
+                    },
+                    {
+                        id: "3.1", title: "3.1 Arreglos Rectangulares",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Inicia el conteo uno por uno irremediablemente." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Intenta agrupar pero se pierde en la suma." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Utiliza suma iterada correctamente (4+4+4 o 3+3+3+3)." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Entiende el arreglo como un principio de multiplicación (3 veces 4)." }
+                        ]
+                    },
+                    {
+                        id: "4.1", title: "4.1 Fluidez con Reagrupación (60s)",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Falla sistemáticamente en el proceso de reagrupación." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Proceso mental lento, con errores en llevar/pedir." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Acierta la mayoría de las operaciones en el tiempo." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Fluidez total mental aplicando estrategias ágiles." }
+                        ]
+                    }
+                ],
+                errors: [
+                    { id: "e3_inver", text: "Inversión posicional en la lectura o escritura (ej. confundir 345 y 354)." },
+                    { id: "e3_restainv", text: "Resta invertida en reagrupación (restar el menor del mayor siempre)." },
+                    { id: "e3_iter", text: "Incapacidad para superar el conteo uno a uno frente a arreglos." }
                 ]
             },
-            {
-                id: "2.1",
-                title: "2.1 Sucesiones Crecientes (Patrón complejo)",
-                levels: [
-                    { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No identifica patrón o adivina números (solo maneja +1)." },
-                    { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Identifica patrón (+50) pero comete errores de cálculo al sumar." },
-                    { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Completa la sucesión correctamente (1.350)." },
-                    { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Crea sucesiones complejas o explica la regla general verbalmente." }
+            "04": {
+                title: "Cuarto de Básica",
+                questions: [
+                    {
+                        id: "1.1", title: "1.1 Patrones Numéricos (4 cifras)",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No identifica la regla ni continúa la secuencia." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Nota que crece, pero falla al sumar la regla constante." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Descubre la regla (+50) y completa los siguientes números." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Explica verbalmente la regla de forma analítica y rápida." }
+                        ]
+                    },
+                    {
+                        id: "2.1", title: "2.1 Propiedad Conmutativa",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Asume que al cambiar el orden, cambia el resultado." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Duda de la propiedad y necesita calcular manualmente para verificar." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Reconoce sin calcular que el resultado será el mismo." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Verbaliza y explica el principio de la propiedad conmutativa." }
+                        ]
+                    },
+                    {
+                        id: "3.1", title: "3.1 Prueba de la Resta",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No sabe cómo comprobar la operación." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Propone volver a restar o usar métodos sin lógica inversa." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Propone la suma de 3000 + 2000 correctamente." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Entiende y explica la relación inversa entre adición y sustracción." }
+                        ]
+                    },
+                    {
+                        id: "4.1", title: "4.1 Medidas de Longitud",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Falla en asignar la unidad correcta a ambos objetos." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Acierta en un objeto pero se confunde en el otro." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Asigna correctamente centímetros al lápiz y metros al árbol." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Justifica lógicamente por proporciones el uso de las medidas." }
+                        ]
+                    },
+                    {
+                        id: "5.1", title: "5.1 Tablas de Multiplicar (60s)",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Desconocimiento general de las tablas de multiplicar." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Utiliza suma iterada o memoria tardía; acierta menos de la mitad." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Evocación correcta en la mayoría, dentro del límite de tiempo." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Evocación rápida, automática e infalible." }
+                        ]
+                    }
+                ],
+                errors: [
+                    { id: "e4_tablas", text: "Tablas de multiplicar no consolidadas en la memoria a largo plazo." },
+                    { id: "e4_conmut", text: "No asimila lógicamente la propiedad conmutativa (dependencia de cálculo)." },
+                    { id: "e4_medidas", text: "Falta de estimación espacial y confusión entre cm y m." }
                 ]
             },
-            {
-                id: "2.2",
-                title: "2.2 Sucesiones Decrecientes (Inversa)",
-                levels: [
-                    { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No logra la cuenta regresiva o resta incorrectamente." },
-                    { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Identifica que baja, pero erra en la resta (error de cálculo)." },
-                    { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Completa correctamente (48) identificando patrón -8." },
-                    { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Reconoce patrones inversos (relaciona con tabla del 8)." }
+            "05": {
+                title: "Quinto de Básica",
+                questions: [
+                    {
+                        id: "1.1", title: "1.1 Potencias de 10",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Intenta multiplicar algorítmicamente y falla." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Conoce el truco de los ceros pero se equivoca al aplicarlo." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Aplica correctamente el atajo de la multiplicación por 10 y 100." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Dominio absoluto, explica verbalmente cómo funciona la base 10." }
+                        ]
+                    },
+                    {
+                        id: "2.1", title: "2.1 Propiedad Asociativa",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Cree que los paréntesis alteran el resultado numérico total." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Duda y siente la necesidad de calcular para comprobar." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Comprende lógicamente la propiedad sin necesidad de calcular." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Generaliza la propiedad conmutativa y asociativa como atajos." }
+                        ]
+                    },
+                    {
+                        id: "3.1", title: "3.1 Perímetro, Ángulos y Longitud",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Falla al identificar conceptos geométricos y de medida." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Acierta en un concepto (ej. ángulo) pero falla en el perímetro/longitud." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Identifica ángulo recto, explica suma del perímetro y conversión básica." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Integración conceptual rápida y analítica sin titubear." }
+                        ]
+                    },
+                    {
+                        id: "4.1", title: "4.1 Fluidez y División (75s)",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No logra resolver, bloqueo notorio en la división." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Lento, se atasca en división o restas grandes." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Acierta la mayoría demostrando retención y lógica." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Fluidez mental total en las 4 operaciones combinadas." }
+                        ]
+                    }
+                ],
+                errors: [
+                    { id: "e5_potencia", text: "Ausencia del algoritmo rápido para multiplicar por potencias de 10." },
+                    { id: "e5_perimetro", text: "Confusión entre perímetro (suma de lados) y área." },
+                    { id: "e5_division", text: "Dificultad o bloqueo al dividir mentalmente para una cifra." }
                 ]
             },
-            {
-                id: "3.1",
-                title: "3.1 Cálculo Mental (Fluidez)",
-                levels: [
-                    { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Necesita conteo físico (dedos). Tasa error > 50%." },
-                    { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Correcto pero lento (>5 seg/ítem). No automatizado." },
-                    { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Recuperación automática (<3 seg/ítem) y correcta." },
-                    { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Fluidez total. Aplica en contextos de estimación." }
-                ]
-            },
-            {
-                id: "3.2",
-                title: "3.2 Estrategias y Trucos (x9, x1000)",
-                levels: [
-                    { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No conoce trucos, intenta sumar repetidamente." },
-                    { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Aplica truco mecánicamente pero se confunde al explicar." },
-                    { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Usa trucos eficientemente (ej. agregar ceros)." },
-                    { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Generaliza el truco a otros casos nuevos." }
-                ]
-            },
-            {
-                id: "4.1",
-                title: "4.1 Resolución de Problemas",
-                levels: [
-                    { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Error de modelado: No sabe qué operación usar." },
-                    { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Identifica operación correcta pero falla en el algoritmo." },
-                    { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Plantea y resuelve el problema correctamente." },
-                    { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Propone múltiples estrategias o verifica sentido de respuesta." }
-                ]
-            },
-            {
-                id: "4.2",
-                title: "4.2 Vocabulario Matemático",
-                levels: [
-                    { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Desconoce términos ('cosa de arriba', 'respuesta')." },
-                    { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Confunde multiplicando con multiplicador. No sabe 'Producto'." },
-                    { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Identifica correctamente los 3 términos técnicos." },
-                    { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Usa vocabulario técnico con naturalidad durante toda la prueba." }
+            "06": {
+                title: "Sexto y Séptimo de Básica",
+                questions: [
+                    {
+                        id: "1.1", title: "1.1 Concepto Histórico (Origen)",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No da respuesta lógica o no entiende la necesidad de registro." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Sugiere conteo simple pero sin método de registro físico." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Propone marcas, piedras o símbolos (correspondencia 1 a 1)." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Explica la lógica del sistema: necesidad de agrupar o inventar símbolos." }
+                        ]
+                    },
+                    {
+                        id: "1.2", title: "1.2 Lectura de Números",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Lee dígitos por separado (ej. 'cuatro, cero, cinco...')." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Lee con dificultad, pausa en puntos de mil o ignora ceros intermedios." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Lee fluidamente respetando periodos de millón y mil." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Lectura automática, segura y correcta al primer intento." }
+                        ]
+                    },
+                    {
+                        id: "1.3", title: "1.3 Descomposición",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No logra descomponer ni identificar valor posicional." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Identifica valor (ej. 80 millones) pero falla la descomposición aditiva." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Identifica valor y realiza la descomposición aditiva correctamente." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Explica la lógica posicional y el rol del cero con fluidez." }
+                        ]
+                    },
+                    {
+                        id: "2.1", title: "2.1 Sucesiones Crecientes",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No identifica patrón o adivina números (solo maneja +1)." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Identifica patrón (+50) pero comete errores de cálculo al sumar." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Completa la sucesión correctamente (1.350)." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Crea sucesiones complejas o explica la regla general verbalmente." }
+                        ]
+                    },
+                    {
+                        id: "2.2", title: "2.2 Sucesiones Decrecientes",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No logra la cuenta regresiva o resta incorrectamente." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Identifica que baja, pero erra en la resta (error de cálculo)." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Completa correctamente (48) identificando patrón -8." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Reconoce patrones inversos (relaciona con tabla del 8)." }
+                        ]
+                    },
+                    {
+                        id: "3.1", title: "3.1 Cálculo Mental (Fluidez)",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Necesita conteo físico (dedos). Tasa error > 50%." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Correcto pero lento (>5 seg/ítem). No automatizado." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Recuperación automática (<3 seg/ítem) y correcta." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Fluidez total. Aplica en contextos de estimación." }
+                        ]
+                    },
+                    {
+                        id: "3.2", title: "3.2 Estrategias y Trucos",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "No conoce trucos, intenta sumar repetidamente." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Aplica truco mecánicamente pero se confunde al explicar." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Usa trucos eficientemente (ej. agregar ceros)." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Generaliza el truco a otros casos nuevos." }
+                        ]
+                    },
+                    {
+                        id: "4.1", title: "4.1 Resolución de Problemas",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Error de modelado: No sabe qué operación usar." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Identifica operación correcta pero falla en el algoritmo." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Plantea y resuelve el problema correctamente." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Propone múltiples estrategias o verifica sentido de respuesta." }
+                        ]
+                    },
+                    {
+                        id: "4.2", title: "4.2 Vocabulario Matemático",
+                        levels: [
+                            { val: 1, label: "Nivel 1: Inicio", color: "text-red-600", text: "Desconoce términos ('cosa de arriba', 'respuesta')." },
+                            { val: 2, label: "Nivel 2: Proceso", color: "text-orange-500", text: "Confunde multiplicando con multiplicador. No sabe 'Producto'." },
+                            { val: 3, label: "Nivel 3: Adquirido", color: "text-green-600", text: "Identifica correctamente los 3 términos técnicos." },
+                            { val: 4, label: "Nivel 4: Dominio", color: "text-blue-600", text: "Usa vocabulario técnico con naturalidad durante toda la prueba." }
+                        ]
+                    }
+                ],
+                errors: [
+                    { id: "e6_sintaxis", text: "Sintaxis: Escribe concatenando (ej: '3000500' en vez de 3.500)." },
+                    { id: "e6_magnitud", text: "Magnitud: Falla al comparar números grandes de igual longitud." },
+                    { id: "e6_modelo", text: "Modelado: Opera basándose solo en palabras clave sin pensar." },
+                    { id: "e6_vocab", text: "Vocabulario: Confunde 'Producto' con 'Suma' o 'Diferencia'." }
                 ]
             }
-        ];
+        };
 
-        const errorList = [
-            { id: "err_sintaxis", text: "Sintaxis: Escribe '3000500' en vez de 3.500.000 (Concatenación)" },
-            { id: "err_magnitud", text: "Magnitud: Falla al comparar números de igual longitud (405 vs 450)" },
-            { id: "err_conteo", text: "Fluidez: Usa suma repetida en vez de multiplicar (7x6 = 7+7...)" },
-            { id: "err_resta", text: "Resta: Resta invertida (siempre resta el número menor del mayor)" },
-            { id: "err_modelo", text: "Modelado: Opera basándose solo en palabras clave sin contexto" },
-            { id: "err_vocab", text: "Vocabulario: Confunde 'Producto' con 'Suma' o 'Diferencia'" }
-        ];
+        // Estado global
+        let currentGradeId = "01"; 
 
-        // --- 2. INICIALIZACIÓN ---
+        // --- INICIALIZACIÓN ---
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('evalDate').valueAsDate = new Date();
             document.getElementById('report-date').textContent = new Date().toLocaleDateString('es-EC', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            renderForm();
+            renderForm(currentGradeId);
         });
 
-        function switchTab(tab) {
+        function switchMainTab(tab) {
             document.getElementById('view-evaluador').classList.toggle('hidden', tab !== 'evaluador');
             document.getElementById('view-analista').classList.toggle('hidden', tab !== 'analista');
             document.getElementById('btn-evaluador').classList.toggle('active', tab === 'evaluador');
             document.getElementById('btn-analista').classList.toggle('active', tab === 'analista');
         }
 
-        // --- 3. RENDERIZADO DEL FORMULARIO (EVALUADOR) ---
-        function renderForm() {
+        function selectGrade(gradeId) {
+            currentGradeId = gradeId;
+            document.querySelectorAll('.grade-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`tab-grade-${gradeId}`).classList.add('active');
+            renderForm(gradeId);
+        }
+
+        // --- RENDERIZADO DEL FORMULARIO DINÁMICO ---
+        function renderForm(gradeId) {
+            const gradeData = gradesDB[gradeId];
+            document.getElementById('form-title').innerText = "Ficha de Evaluación - " + gradeData.title;
+            
             const container = document.getElementById('questions-container');
-            container.innerHTML = rubricData.map(q => `
+            container.innerHTML = gradeData.questions.map(q => `
                 <div class="bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                     <div class="bg-blue-50 px-4 py-3 border-b flex justify-between items-center">
                         <h3 class="font-bold text-gray-800 text-lg">${q.title}</h3>
@@ -393,14 +613,14 @@
                             `).join('')}
                         </div>
                         <div class="mt-4">
-                            <input type="text" name="obs_${q.id}" class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 border bg-gray-50" placeholder="Observaciones específicas para ${q.title}...">
+                            <input type="text" name="obs_${q.id}" class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 border bg-gray-50" placeholder="Observaciones específicas (opcional)...">
                         </div>
                     </div>
                 </div>
             `).join('');
 
             const errContainer = document.getElementById('errors-container');
-            errContainer.innerHTML = errorList.map(err => `
+            errContainer.innerHTML = gradeData.errors.map(err => `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b last:border-0 py-4 border-red-100 hover:bg-red-50 transition px-2 rounded">
                     <span class="text-gray-800 font-medium text-sm w-full sm:w-3/4 pr-4 mb-2 sm:mb-0 flex items-center">
                          <i class="fa-solid fa-circle-exclamation text-red-300 mr-2 text-xs"></i>
@@ -428,15 +648,17 @@
             }
         }
 
-        // --- 4. GUARDAR DATOS (JSON) ---
+        // --- GUARDADO DE DATOS (Nomenclatura requerida) ---
         function saveData() {
             const student = document.getElementById('studentName').value;
             if (!student) { alert("Por favor ingrese el nombre del estudiante"); return; }
 
+            const gradeData = gradesDB[currentGradeId];
             const data = {
                 meta: {
                     student: student,
-                    grade: document.getElementById('studentGrade').value,
+                    gradeId: currentGradeId,
+                    gradeTitle: gradeData.title,
                     date: document.getElementById('evalDate').value,
                 },
                 scores: {},
@@ -444,14 +666,14 @@
                 errors: {}
             };
 
-            rubricData.forEach(q => {
+            gradeData.questions.forEach(q => {
                 const checked = document.querySelector(`input[name="q_${q.id}"]:checked`);
                 data.scores[q.id] = checked ? parseInt(checked.value) : 0;
                 const obs = document.querySelector(`input[name="obs_${q.id}"]`).value;
                 if(obs) data.observations[q.id] = obs;
             });
 
-            errorList.forEach(err => {
+            gradeData.errors.forEach(err => {
                 const checked = document.querySelector(`input[name="${err.id}"]:checked`);
                 data.errors[err.id] = checked ? checked.value : 'no';
             });
@@ -461,14 +683,18 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `EGMA_${student.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
+            
+            // Nomenclatura estricta: 01_Nombre_Apellido.json
+            const formattedName = student.trim().replace(/\s+/g, '_');
+            a.download = `${currentGradeId}_${formattedName}.json`;
+            
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
 
-        // --- 5. MODO ANALISTA Y PDF ---
+        // --- MODO ANALISTA ---
         let chartInstance = null;
 
         async function processFiles(files) {
@@ -489,55 +715,65 @@
             }
 
             calculateAndRender(results);
-            status.textContent = `¡Análisis Completado! ${results.length} evaluaciones cargadas.`;
+            status.textContent = `¡Análisis Completado! ${results.length} evaluaciones procesadas.`;
             document.getElementById('dashboard').classList.remove('hidden');
         }
 
         function calculateAndRender(data) {
             const totalStudents = data.length;
             let sumGlobal = 0;
-            let countScores = 0;
             let studentsInRisk = 0; 
             let acquiredCount = 0; 
 
+            // Diccionarios dinámicos para agrupar mezclas de grados
             const questionAvgs = {};
-            rubricData.forEach(q => questionAvgs[q.id] = { sum: 0, count: 0 });
-
             const errorCounts = {};
-            errorList.forEach(e => errorCounts[e.id] = 0);
-
             const studentDetails = [];
 
             data.forEach(d => {
                 let sSum = 0;
                 let sCount = 0;
                 let n1Count = 0;
+                const gData = gradesDB[d.meta.gradeId];
 
+                // Procesar Puntajes
                 Object.entries(d.scores).forEach(([qid, val]) => {
                     if (val > 0) {
                         sSum += val;
                         sCount++;
                         if (val === 1) n1Count++;
-                        if (questionAvgs[qid]) {
-                            questionAvgs[qid].sum += val;
-                            questionAvgs[qid].count++;
-                        }
+                        
+                        // Encontrar título de pregunta para el gráfico
+                        let qDef = gData ? gData.questions.find(q => q.id === qid) : null;
+                        let label = qDef ? `[${d.meta.gradeId}] ${qDef.title}` : `G${d.meta.gradeId} - Q${qid}`;
+                        
+                        if (!questionAvgs[label]) questionAvgs[label] = { sum: 0, count: 0 };
+                        questionAvgs[label].sum += val;
+                        questionAvgs[label].count++;
                     }
                 });
 
+                // Procesar Errores
                 Object.entries(d.errors).forEach(([eid, val]) => {
-                    if (val === 'si' && errorCounts[eid] !== undefined) errorCounts[eid]++;
+                    if (val === 'si') {
+                        let errDef = gData ? gData.errors.find(e => e.id === eid) : null;
+                        let eLabel = errDef ? `[${d.meta.gradeId}] ${errDef.text}` : eid;
+                        
+                        if (!errorCounts[eLabel]) errorCounts[eLabel] = 0;
+                        errorCounts[eLabel]++;
+                    }
                 });
 
                 const sAvg = sCount > 0 ? (sSum / sCount) : 0;
                 sumGlobal += sAvg;
                 
                 if (sAvg >= 3) acquiredCount++;
-                const isRisk = n1Count >= 3;
+                const isRisk = n1Count >= 2; // Ajustado a 2 para grados con menos preguntas
                 if (isRisk) studentsInRisk++;
 
                 studentDetails.push({
                     name: d.meta.student,
+                    grade: d.meta.gradeId,
                     avg: sAvg.toFixed(2),
                     status: isRisk ? 'Riesgo' : (sAvg >= 3 ? 'Adquirido' : 'En Proceso')
                 });
@@ -548,21 +784,23 @@
             document.getElementById('kpi-success').textContent = totalStudents > 0 ? Math.round((acquiredCount / totalStudents) * 100) + "%" : "0%";
             document.getElementById('kpi-risk').textContent = studentsInRisk;
 
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            const values = rubricData.map(q => {
-                const qData = questionAvgs[q.id];
-                return qData.count > 0 ? (qData.sum / qData.count).toFixed(2) : 0;
+            // Renderizar Gráfico
+            const qLabels = Object.keys(questionAvgs);
+            const qValues = qLabels.map(lbl => {
+                const qd = questionAvgs[lbl];
+                return qd.count > 0 ? (qd.sum / qd.count).toFixed(2) : 0;
             });
 
+            const ctx = document.getElementById('mainChart').getContext('2d');
             if (chartInstance) chartInstance.destroy();
             chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: rubricData.map(q => q.title.length > 25 ? q.title.substring(0, 25) + "..." : q.title),
+                    labels: qLabels.map(l => l.length > 30 ? l.substring(0, 30) + "..." : l),
                     datasets: [{
-                        label: 'Promedio de Nivel (1-4)',
-                        data: values,
-                        backgroundColor: values.map(v => v < 2 ? '#ef4444' : v < 3 ? '#f59e0b' : '#10b981'),
+                        label: 'Promedio Obtenido (1-4)',
+                        data: qValues,
+                        backgroundColor: qValues.map(v => v < 2 ? '#ef4444' : v < 3 ? '#f59e0b' : '#10b981'),
                         borderRadius: 4
                     }]
                 },
@@ -573,26 +811,34 @@
                 }
             });
 
-            const tbodyErr = document.getElementById('errors-table-body');
-            tbodyErr.innerHTML = errorList
-                .map(err => {
-                    const count = errorCounts[err.id];
-                    const pct = totalStudents > 0 ? ((count / totalStudents) * 100).toFixed(1) : "0.0";
-                    return { ...err, count, pct };
-                })
-                .sort((a, b) => b.count - a.count) 
-                .map(err => `
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="px-4 py-3 font-medium text-gray-700">${err.text}</td>
-                        <td class="px-4 py-3 text-center text-gray-900">${err.count}</td>
-                        <td class="px-4 py-3 text-center text-red-600 font-bold">${err.pct}%</td>
-                    </tr>
-                `).join('');
+            // Renderizar Tabla Errores
+            const errArray = Object.keys(errorCounts).map(lbl => {
+                return { 
+                    text: lbl, 
+                    count: errorCounts[lbl], 
+                    pct: totalStudents > 0 ? ((errorCounts[lbl] / totalStudents) * 100).toFixed(1) : "0.0" 
+                };
+            }).sort((a, b) => b.count - a.count);
 
+            const tbodyErr = document.getElementById('errors-table-body');
+            tbodyErr.innerHTML = errArray.map(err => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-3 font-medium text-gray-700">${err.text}</td>
+                    <td class="px-4 py-3 text-center text-gray-900">${err.count}</td>
+                    <td class="px-4 py-3 text-center text-red-600 font-bold">${err.pct}%</td>
+                </tr>
+            `).join('');
+            
+            if(errArray.length === 0) {
+                tbodyErr.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-gray-500">No se reportaron errores en los archivos cargados.</td></tr>`;
+            }
+
+            // Renderizar Estudiantes
             const tbodyStu = document.getElementById('students-table-body');
-            tbodyStu.innerHTML = studentDetails.map(s => `
+            tbodyStu.innerHTML = studentDetails.sort((a,b) => a.grade.localeCompare(b.grade)).map(s => `
                 <tr class="hover:bg-gray-50 border-b">
                     <td class="px-4 py-3 font-medium text-gray-900">${s.name}</td>
+                    <td class="px-4 py-3 text-center text-gray-500">G-${s.grade}</td>
                     <td class="px-4 py-3 text-center font-bold text-gray-700">${s.avg}</td>
                     <td class="px-4 py-3 text-center">
                         <span class="px-3 py-1 rounded-full text-xs font-bold text-white ${s.status === 'Riesgo' ? 'bg-red-500' : s.status === 'Adquirido' ? 'bg-green-500' : 'bg-yellow-500'}">
@@ -607,14 +853,13 @@
         function downloadReportPDF() {
             const element = document.getElementById('report-content');
             const opt = {
-                margin:       [10, 10, 10, 10], // top, left, bottom, right
-                filename:     `Informe_EGMA_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
+                margin:       [10, 10, 10, 10], 
+                filename:     `Informe_EGMA_Consolidado_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
             
-            // Generar PDF
             html2pdf().set(opt).from(element).save();
         }
     </script>
